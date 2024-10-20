@@ -6,10 +6,23 @@ import { doc, updateDoc, arrayUnion, getDoc, setDoc } from "firebase/firestore";
 import { ref, onValue } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 import CumulativeStockValueChart from "./components/cumalative"; // Chart component
-import "./portfolio.css"; // Import CSS file
+// import "./portfolio.css"; // Import CSS file
 import { signOut } from "firebase/auth"; // Import signOut function
 import PortfolioTotalValueChart from "./components/total";
-const cryptoList = ['btcusd', 'ethusd', 'ltcusd', 'xrpusd', 'adausd', 'bnbusd', 'dotusd', 'linkusd', 'dogeusd', 'solusd', 'maticusd', 'uniusd'];
+const cryptoList = [
+  "btcusd",
+  "ethusd",
+  "ltcusd",
+  "xrpusd",
+  "adausd",
+  "bnbusd",
+  "dotusd",
+  "linkusd",
+  "dogeusd",
+  "solusd",
+  "maticusd",
+  "uniusd",
+];
 
 function Portfolio() {
   const [stocks, setStocks] = useState([]);
@@ -46,7 +59,11 @@ function Portfolio() {
 
   const addCrypto = async (e) => {
     e.preventDefault();
-    if (newTicker && newQuantity && cryptoList.includes(newTicker.toLowerCase())) {
+    if (
+      newTicker &&
+      newQuantity &&
+      cryptoList.includes(newTicker.toLowerCase())
+    ) {
       const ticker = newTicker.toLowerCase();
       const quantity = parseInt(newQuantity);
       const newStock = { ticker, quantity };
@@ -82,8 +99,9 @@ function Portfolio() {
       {/* Navbar */}
       <nav className="navbar bg-gray-900 p-4 flex justify-between items-center">
         <div className="flex items-center">
-          <img src="/path/to/logo.png" alt="Logo" className="h-8 mr-4" /> {/* Replace with actual logo */}
-          <h1 className="text-xl text-white font-bold">MyCryptoApp</h1>
+          <img src="/path/to/logo.png" alt="Logo" className="h-8 mr-4" />{" "}
+          {/* Replace with actual logo */}
+          <h1 className="text-xl text-white font-bold ">MyCryptoApp</h1>
         </div>
         <div>
           {user ? (
@@ -143,15 +161,23 @@ function Portfolio() {
               onChange={(e) => setNewQuantity(e.target.value)}
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <button type="submit" className="w-full p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300">
+            <button
+              type="submit"
+              className="w-full p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300"
+            >
               Add to Portfolio
             </button>
           </form>
         </div>
 
         {/* Main Center Graph */}
-        <div className="flex-grow bg-black p-4" style={{width:"50vw", height:'90vh'}}>
-          <h1 className="text-3xl font-bold text-white mb-4">Total Portfolio Value</h1>
+        <div
+          className="flex-grow bg-black p-4"
+          style={{ width: "50vw", height: "90vh" }}
+        >
+          <h1 className="text-2xl font-bold text-white mb-4">
+            Total Portfolio Value
+          </h1>
           <div className="bg-gray-800 p-6 rounded-lg shadow-lg h-96">
             <PortfolioTotalValueChart stocks={stocks} />
           </div>
@@ -160,10 +186,34 @@ function Portfolio() {
         {/* Right Sidebar with small graphs */}
         <div className="w-1/4 p-4 bg-gray-900 text-white">
           <h2 className="text-xl font-bold mb-4">Your Portfolio</h2>
-          <div className="space-y-4" style={{maxHeight:'80%', overflowY:'auto', backgroundColor:'white', width:'20vw', height:'80%', borderRadius:'5px'}}>
+          <div
+            className="space-y-4"
+            style={{
+              maxHeight: "80%",
+              overflowY: "auto",
+              backgroundColor: "white",
+              width: "20vw",
+              height: "80%",
+              borderRadius: "5px",
+            }}
+          >
             {stocks.map((stock) => (
-              <div key={stock.ticker} className="bg-gray-800 p-4 rounded shadow" style={{background:'grey', borderRadius:'5px', padding:'5px', margin:'auto', width:'15vw', marginBottom:'10px', marginTop:'10px'}}>
-                <h3 className="text-lg font-bold">{stock.ticker.toUpperCase()}</h3>
+              <div
+                key={stock.ticker}
+                className="bg-gray-800 p-4 rounded shadow"
+                style={{
+                  background: "grey",
+                  borderRadius: "5px",
+                  padding: "5px",
+                  margin: "auto",
+                  width: "15vw",
+                  marginBottom: "10px",
+                  marginTop: "10px",
+                }}
+              >
+                <h3 className="text-lg font-bold">
+                  {stock.ticker.toUpperCase()}
+                </h3>
                 <div className="flex justify-between items-center">
                   <span>{cryptoPrices[stock.ticker]?.toFixed(2)}</span>
                   <CumulativeStockValueChart ticker={stock.ticker} />

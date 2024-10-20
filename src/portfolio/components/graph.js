@@ -1,6 +1,14 @@
 // src/components/CumulativeStockValueChart.js
 import { useState, useEffect } from "react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import { ref, onValue } from "firebase/database";
 import { database } from "../../login/firebase";
 
