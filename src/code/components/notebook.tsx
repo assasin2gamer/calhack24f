@@ -1,12 +1,11 @@
-"use client";
-
+// "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { Loader2, Play, Plus, Trash, FileText, Code } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
+import { Button } from "./ui/Button.tsx";
+import { Card, CardContent } from "./ui/Card.tsx";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/Tabs.tsx";
+import { ScrollArea } from "./ui/ScrollArea.tsx"; //components/ui/scroll-area.tsx";
+import { Separator } from "./ui/Separator.tsx";
 
 const CodeEditor = ({ value, onChange, onRun }) => {
   const [lineNumbers, setLineNumbers] = useState<string[]>([]);
@@ -32,11 +31,11 @@ const CodeEditor = ({ value, onChange, onRun }) => {
     <div className="relative font-mono text-sm border rounded">
       <div
         ref={lineNumbersRef}
-        className="absolute left-0 top-0 bottom-0 w-12 bg-muted flex flex-col items-end pr-2 pt-2 text-muted-foreground select-none overflow-hidden"
-        style={{ height: "100%", overflowY: "hidden" }}
+        className="absolute left-0 top-0 bottom-0 w-12 bg-muted flex flex-col items-end pr-2 pt-2 select-none overflow-hidden"
+        style={{ height: "100%", overflowY: "hidden", color: "black" }}
       >
         {lineNumbers.map((num, i) => (
-          <div key={i} className="h-6 leading-6">
+          <div key={i} className="h-6 leading-6" style={{ color: "black" }}>
             {num}
           </div>
         ))}
@@ -49,12 +48,13 @@ const CodeEditor = ({ value, onChange, onRun }) => {
           updateLineNumbers();
         }}
         onScroll={handleScroll}
-        className="w-full h-64 p-2 pl-14 bg-background text-foreground rounded resize-none focus:outline-none focus:ring-2 focus:ring-ring"
+        className="w-full h-64 p-2 pl-14 bg-background rounded resize-none focus:outline-none focus:ring-2 focus:ring-ring"
         spellCheck="false"
         style={{
           lineHeight: "1.5rem",
           tabSize: 2,
           overflowY: "scroll",
+          color: "black",
         }}
       />
       <Button size="sm" className="absolute right-2 bottom-2" onClick={onRun}>
@@ -69,7 +69,11 @@ const MarkdownEditor = ({ value, onChange }) => {
     <textarea
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full h-64 p-2 bg-background text-foreground border rounded resize-none focus:outline-none focus:ring-2 focus:ring-ring"
+      className="w-full h-64 p-2 bg-background border rounded resize-none focus:outline-none focus:ring-2 focus:ring-ring"
+      style={{
+        color: "black",
+        lineHeight: "1.5rem",
+      }}
       placeholder="Write your markdown here..."
     />
   );
@@ -134,7 +138,7 @@ const NotebookCell = ({ cell, index, onRun, onDelete, onChange }) => {
   );
 };
 
-export const NotebookComponent = () => {
+export function NotebookComponent() {
   const [pyodide, setPyodide] = useState<any>(null);
   const [cells, setCells] = useState([
     {
@@ -253,7 +257,7 @@ export const NotebookComponent = () => {
       </ScrollArea>
     </div>
   );
-};
+}
 
 export function Notebook() {
   return (

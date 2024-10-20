@@ -1,5 +1,5 @@
 // import { NavbarComponent } from "../../components/navbar";
-import { NotebookComponent } from "../../components/notebook";
+import { NotebookComponent } from "./components/notebook.tsx";
 
 function Code() {
   return (
