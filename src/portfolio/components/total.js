@@ -10,15 +10,20 @@ import {
 import { useState, useEffect } from "react";
 import { ref, onValue } from "firebase/database";
 import { database } from "../../login/firebase"; // Your Firebase configuration
-// import "../portfolio.css";  // Import CSS file
 
 const PortfolioTotalValueChart = ({ stocks }) => {
   const [chartData, setChartData] = useState([]);
   const [pollingInterval, setPollingInterval] = useState(5000); // Poll every 5 seconds
 
-  useEffect(() => {
-    console.log("Stocks received in PortfolioTotalValueChart:", stocks);
+  // Function to normalize data from Firebase and convert to a consistent format
+  const normalizeData = (stockData, quantity) => {
+    return Object.entries(stockData).map(([key, data]) => ({
+      date: new Date(data.timestamp), // Assume 'timestamp' field exists
+      value: parseFloat(data.price) * quantity, // Multiply price by quantity to get total value
+    }));
+  };
 
+  useEffect(() => {
     if (!stocks || stocks.length === 0) {
       console.log("No stocks data available");
       return;
@@ -34,70 +39,39 @@ const PortfolioTotalValueChart = ({ stocks }) => {
       return acc;
     }, {});
 
-    const stockRefs = Object.values(combinedStocks).map((stock) =>
-      ref(database, `live-crypto-data/${stock.ticker}`)
-    );
-
-    const processStockData = (stockData, quantity) => {
-      return Object.entries(stockData).map(([key, data]) => ({
-        date: new Date(data.timestamp),
-        value: parseFloat(data.price) * quantity,
-      }));
-    };
-
     const fetchDataForAllStocks = () => {
-      console.log("Fetching data for all stocks");
-      const combinedData = {};
-      const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
-
+      const allStockData = [];
       let completedFetches = 0;
+      const totalStocks = Object.values(combinedStocks).length;
 
-      Object.values(combinedStocks).forEach((stock, index) => {
-        const stockRef = stockRefs[index];
-        onValue(
-          stockRef,
-          (snapshot) => {
-            const data = snapshot.val();
-            console.log(`Data received for ${stock.ticker}:`, data);
-            if (data) {
-              const processedData = processStockData(data, stock.quantity);
-              console.log(`Processed data for ${stock.ticker}:`, processedData);
+      Object.values(combinedStocks).forEach((stock) => {
+        const stockRef = ref(database, `live-crypto-data/${stock.ticker}`);
+        const quantity = stock.quantity;
 
-              processedData.forEach((entry) => {
-                const { date, value } = entry;
-                if (date > tenMinutesAgo) {
-                  const dateString = date.toISOString();
-                  if (!combinedData[dateString]) {
-                    combinedData[dateString] = {
-                      date: date.toLocaleString(),
-                      totalValue: 0,
-                    };
-                  }
-                  combinedData[dateString].totalValue += value;
+        onValue(stockRef, (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            const processedData = normalizeData(data, quantity);
+            allStockData.push(processedData);
+          }
+          completedFetches++;
+
+          // Once all stocks have been fetched
+          if (completedFetches === totalStocks) {
+            // Combine all stock data by summing values
+            const totalValueData = allStockData.reduce((acc, stockArray) => {
+              return stockArray.map((dataPoint, index) => {
+                if (!acc[index]) {
+                  acc[index] = { date: dataPoint.date, totalValue: 0 };
                 }
+                acc[index].totalValue += dataPoint.value;
+                return acc[index];
               });
-            }
+            }, []);
 
-            completedFetches++;
-            console.log(
-              `Completed fetches: ${completedFetches}/${
-                Object.keys(combinedStocks).length
-              }`
-            );
-            if (completedFetches === Object.keys(combinedStocks).length) {
-              const sortedData = Object.values(combinedData).sort(
-                (a, b) => new Date(a.date) - new Date(b.date)
-              );
-              console.log("Final chart data:", sortedData);
-              if (sortedData.length > 0) {
-                setChartData(sortedData);
-              } else {
-                console.log("No data within the last 10 minutes");
-              }
-            }
-          },
-          { onlyOnce: true }
-        );
+            setChartData(totalValueData);
+          }
+        });
       });
     };
 
@@ -105,43 +79,36 @@ const PortfolioTotalValueChart = ({ stocks }) => {
     fetchDataForAllStocks();
     const intervalId = setInterval(fetchDataForAllStocks, pollingInterval);
 
-    // Cleanup on unmount
     return () => clearInterval(intervalId);
   }, [stocks, pollingInterval]);
 
   return (
     <div>
-      <h3 className="text-lg font-bold">
-        Total Portfolio Value (Last 10 Minutes)
-      </h3>
+      <h3 className="text-lg font-bold">Total Portfolio Value (Last 10 Minutes)</h3>
 
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#333" />{" "}
-          {/* Darker grid to fit dark mode */}
-          <XAxis dataKey="date" stroke="#ffffff" />{" "}
-          {/* White X-axis for visibility */}
+          <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+          <XAxis dataKey="date" stroke="#ffffff" />
           <YAxis
-            scale="log"
-            domain={[1, "auto"]} // Set minimum value to 1 for the log scale
+            domain={["auto", "auto"]} // Use auto domain for Y-axis scaling
             stroke="#ffffff"
-            tickFormatter={(tick) => tick.toFixed(2)} // Format ticks
+            tickFormatter={(tick) => tick.toFixed(2)}
           />
           <Tooltip
             contentStyle={{
               backgroundColor: "#1e1e1e",
               borderColor: "#8884d8",
             }}
-            formatter={(value) => `$${value.toFixed(2)}`} // Format tooltip values
+            formatter={(value) => `$${value.toFixed(2)}`}
           />
           <Line
-            type="monotone"
+            type="monotone" // Monotone for smooth line rendering
             dataKey="totalValue"
             stroke="#ff9800"
             strokeWidth={2}
             dot={false}
-          />{" "}
-          {/* Orange line with no dots */}
+          />
         </LineChart>
       </ResponsiveContainer>
     </div>
