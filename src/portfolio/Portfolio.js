@@ -93,9 +93,8 @@ function Portfolio() {
     await signOut(auth);
     navigate("/signin");
   };
-
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
+    <div className="flex flex-col h-screen">
       {/* Navbar */}
       <nav className="bg-white shadow-md p-4 flex justify-between items-center">
         <div className="flex items-center">
@@ -122,12 +121,10 @@ function Portfolio() {
       </nav>
 
       {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className=" flex">
         {/* Left Sidebar */}
         <div className="w-1/4 p-4 bg-white shadow-md overflow-y-auto">
-          <h2 className="text-xl font-bold mb-4 text-gray-800">
-            Add Cryptocurrency
-          </h2>
+          <h2 className="text-2xl font-bold mb-4 text-gray-800">Add Ticker</h2>
           <form onSubmit={addCrypto} className="flex flex-col gap-4">
             <div className="relative">
               <input
@@ -172,10 +169,10 @@ function Portfolio() {
         </div>
 
         {/* Main Center Graph */}
-        <div className="flex-grow p-4 bg-white shadow-md mx-4">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">
+        <div className="w-2/4 p-4 bg-white shadow-md overflow-y-auto">
+          <h2 className="text-2xl font-bold mb-4 text-gray-800">
             Total Portfolio Value
-          </h1>
+          </h2>
           <div className="bg-white p-6 rounded-lg shadow-lg h-[calc(100%-2rem)]">
             <PortfolioTotalValueChart stocks={stocks} />
           </div>
@@ -183,14 +180,14 @@ function Portfolio() {
 
         {/* Right Sidebar with small graphs */}
         <div className="w-1/4 p-4 bg-white shadow-md overflow-y-auto">
-          <h2 className="text-xl font-bold mb-4 text-gray-800">
+          <h2 className="text-2xl font-bold mb-4 text-gray-800">
             Your Portfolio
           </h2>
-          <div className="space-y-4">
+          <div className="flex-grow overflow-y-auto">
             {stocks.map((stock) => (
               <div
                 key={stock.ticker}
-                className="bg-gray-100 p-4 rounded-lg shadow"
+                className="bg-gray-100 p-4 rounded-lg shadow mb-4"
               >
                 <h3 className="text-lg font-bold text-gray-800">
                   {stock.ticker.toUpperCase()}
