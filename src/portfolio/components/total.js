@@ -17,49 +17,87 @@ const PortfolioTotalValueChart = ({ stocks }) => {
   const [pollingInterval, setPollingInterval] = useState(5000); // Poll every 5 seconds
 
   useEffect(() => {
-    const stockRefs = stocks.map((stock) =>
+    console.log("Stocks received in PortfolioTotalValueChart:", stocks);
+
+    if (!stocks || stocks.length === 0) {
+      console.log("No stocks data available");
+      return;
+    }
+
+    // Combine stocks with the same ticker
+    const combinedStocks = stocks.reduce((acc, stock) => {
+      if (acc[stock.ticker]) {
+        acc[stock.ticker].quantity += stock.quantity;
+      } else {
+        acc[stock.ticker] = { ...stock };
+      }
+      return acc;
+    }, {});
+
+    const stockRefs = Object.values(combinedStocks).map((stock) =>
       ref(database, `live-crypto-data/${stock.ticker}`)
     );
 
     const processStockData = (stockData, quantity) => {
-      return Object.keys(stockData).map((key) => {
-        const value = stockData[key].price * quantity;
-        return {
-          date: new Date(stockData[key].timestamp), // Ensure timestamp is a Date object
-          value: value === 0 ? 0.1 : value, // Replace 0 with a small positive number for log scale
-        };
-      });
+      return Object.entries(stockData).map(([key, data]) => ({
+        date: new Date(data.timestamp),
+        value: parseFloat(data.price) * quantity,
+      }));
     };
 
     const fetchDataForAllStocks = () => {
+      console.log("Fetching data for all stocks");
       const combinedData = {};
-      const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000); // 10 minutes ago
+      const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
 
-      stockRefs.forEach((stockRef, index) => {
-        const stock = stocks[index];
-        onValue(stockRef, (snapshot) => {
-          const data = snapshot.val();
-          if (data) {
-            const processedData = processStockData(data, stock.quantity);
+      let completedFetches = 0;
 
-            processedData.forEach((entry) => {
-              const { date, value } = entry;
-              if (date > tenMinutesAgo) {
-                // Only include data from the last 10 minutes
-                if (!combinedData[date]) {
-                  combinedData[date] = {
-                    date: date.toLocaleString(),
-                    totalValue: 0,
-                  };
+      Object.values(combinedStocks).forEach((stock, index) => {
+        const stockRef = stockRefs[index];
+        onValue(
+          stockRef,
+          (snapshot) => {
+            const data = snapshot.val();
+            console.log(`Data received for ${stock.ticker}:`, data);
+            if (data) {
+              const processedData = processStockData(data, stock.quantity);
+              console.log(`Processed data for ${stock.ticker}:`, processedData);
+
+              processedData.forEach((entry) => {
+                const { date, value } = entry;
+                if (date > tenMinutesAgo) {
+                  const dateString = date.toISOString();
+                  if (!combinedData[dateString]) {
+                    combinedData[dateString] = {
+                      date: date.toLocaleString(),
+                      totalValue: 0,
+                    };
+                  }
+                  combinedData[dateString].totalValue += value;
                 }
-                combinedData[date].totalValue += value;
-              }
-            });
-          }
+              });
+            }
 
-          // Set the aggregated data to state after processing all stocks
-          setChartData(Object.values(combinedData));
-        });
+            completedFetches++;
+            console.log(
+              `Completed fetches: ${completedFetches}/${
+                Object.keys(combinedStocks).length
+              }`
+            );
+            if (completedFetches === Object.keys(combinedStocks).length) {
+              const sortedData = Object.values(combinedData).sort(
+                (a, b) => new Date(a.date) - new Date(b.date)
+              );
+              console.log("Final chart data:", sortedData);
+              if (sortedData.length > 0) {
+                setChartData(sortedData);
+              } else {
+                console.log("No data within the last 10 minutes");
+              }
+            }
+          },
+          { onlyOnce: true }
+        );
       });
     };
 

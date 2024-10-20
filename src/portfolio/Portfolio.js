@@ -174,6 +174,7 @@ function Portfolio() {
             Total Portfolio Value
           </h2>
           <div className="bg-white p-6 rounded-lg shadow-lg h-[calc(100%-2rem)]">
+            {console.log(stocks)}
             <PortfolioTotalValueChart stocks={stocks} />
           </div>
         </div>

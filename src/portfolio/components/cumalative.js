@@ -88,8 +88,8 @@ const CumulativeStockValueChart = ({ ticker, totalValue }) => {
         <ResponsiveContainer width="100%" height={100}>
           <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-            <XAxis dataKey="date" stroke="#ffffff" />
-            <YAxis domain={["auto", "auto"]} stroke="#ffffff" />
+            <XAxis dataKey="date" stroke="#000000" />
+            <YAxis domain={["auto", "auto"]} stroke="#000000" />
             <Tooltip
               contentStyle={{
                 backgroundColor: "#1e1e1e",
@@ -125,8 +125,8 @@ const CumulativeStockValueChart = ({ ticker, totalValue }) => {
             <ResponsiveContainer width="100%" height={400}>
               <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                <XAxis dataKey="date" stroke="#ffffff" />
-                <YAxis domain={["auto", "auto"]} stroke="#ffffff" />
+                <XAxis dataKey="date" stroke="#000000" />
+                <YAxis domain={["auto", "auto"]} stroke="#000000" />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: "#1e1e1e",
