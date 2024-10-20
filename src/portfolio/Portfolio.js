@@ -95,26 +95,25 @@ function Portfolio() {
   };
 
   return (
-    <>
+    <div className="flex flex-col h-screen bg-gray-100">
       {/* Navbar */}
-      <nav className="navbar bg-gray-900 p-4 flex justify-between items-center">
+      <nav className="bg-white shadow-md p-4 flex justify-between items-center">
         <div className="flex items-center">
-          <img src="/path/to/logo.png" alt="Logo" className="h-8 mr-4" />{" "}
-          {/* Replace with actual logo */}
-          <h1 className="text-xl text-white font-bold ">MyCryptoApp</h1>
+          <img src="/path/to/logo.png" alt="Logo" className="h-8 mr-4" />
+          <h1 className="text-xl text-gray-800 font-bold">MyCryptoApp</h1>
         </div>
         <div>
           {user ? (
             <button
               onClick={handleSignOut}
-              className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
+              className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition duration-300"
             >
               Sign Out
             </button>
           ) : (
             <button
-              onClick={() => signInWithGoogle()} // Trigger Google sign-in here
-              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+              onClick={() => signInWithGoogle()}
+              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300"
             >
               Sign In with Google
             </button>
@@ -123,10 +122,12 @@ function Portfolio() {
       </nav>
 
       {/* Main Content */}
-      <div className="flex h-screen">
+      <div className="flex flex-1 overflow-hidden">
         {/* Left Sidebar */}
-        <div className="w-1/4 p-4 bg-gray-200 h-full">
-          <h2 className="text-xl font-bold mb-4">Add Cryptocurrency</h2>
+        <div className="w-1/4 p-4 bg-white shadow-md overflow-y-auto">
+          <h2 className="text-xl font-bold mb-4 text-gray-800">
+            Add Cryptocurrency
+          </h2>
           <form onSubmit={addCrypto} className="flex flex-col gap-4">
             <div className="relative">
               <input
@@ -171,51 +172,33 @@ function Portfolio() {
         </div>
 
         {/* Main Center Graph */}
-        <div
-          className="flex-grow bg-black p-4"
-          style={{ width: "50vw", height: "90vh" }}
-        >
-          <h1 className="text-2xl font-bold text-white mb-4">
+        <div className="flex-grow p-4 bg-white shadow-md mx-4">
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">
             Total Portfolio Value
           </h1>
-          <div className="bg-gray-800 p-6 rounded-lg shadow-lg h-96">
+          <div className="bg-white p-6 rounded-lg shadow-lg h-[calc(100%-2rem)]">
             <PortfolioTotalValueChart stocks={stocks} />
           </div>
         </div>
 
         {/* Right Sidebar with small graphs */}
-        <div className="w-1/4 p-4 bg-gray-900 text-white">
-          <h2 className="text-xl font-bold mb-4">Your Portfolio</h2>
-          <div
-            className="space-y-4"
-            style={{
-              maxHeight: "80%",
-              overflowY: "auto",
-              backgroundColor: "white",
-              width: "20vw",
-              height: "80%",
-              borderRadius: "5px",
-            }}
-          >
+        <div className="w-1/4 p-4 bg-white shadow-md overflow-y-auto">
+          <h2 className="text-xl font-bold mb-4 text-gray-800">
+            Your Portfolio
+          </h2>
+          <div className="space-y-4">
             {stocks.map((stock) => (
               <div
                 key={stock.ticker}
-                className="bg-gray-800 p-4 rounded shadow"
-                style={{
-                  background: "grey",
-                  borderRadius: "5px",
-                  padding: "5px",
-                  margin: "auto",
-                  width: "15vw",
-                  marginBottom: "10px",
-                  marginTop: "10px",
-                }}
+                className="bg-gray-100 p-4 rounded-lg shadow"
               >
-                <h3 className="text-lg font-bold">
+                <h3 className="text-lg font-bold text-gray-800">
                   {stock.ticker.toUpperCase()}
                 </h3>
                 <div className="flex justify-between items-center">
-                  <span>{cryptoPrices[stock.ticker]?.toFixed(2)}</span>
+                  <span className="text-gray-600">
+                    {cryptoPrices[stock.ticker]?.toFixed(2)}
+                  </span>
                   <CumulativeStockValueChart ticker={stock.ticker} />
                 </div>
               </div>
@@ -223,7 +206,7 @@ function Portfolio() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
