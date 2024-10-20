@@ -93,6 +93,7 @@ function Portfolio() {
     await signOut(auth);
     navigate("/signin");
   };
+
   return (
     <div className="flex flex-col h-screen">
       {/* Navbar */}
@@ -101,14 +102,23 @@ function Portfolio() {
           <img src="/path/to/logo.png" alt="Logo" className="h-8 mr-4" />
           <h1 className="text-xl text-gray-800 font-bold">MyCryptoApp</h1>
         </div>
-        <div>
+        <div className="flex items-center space-x-4">
           {user ? (
-            <button
-              onClick={handleSignOut}
-              className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition duration-300"
-            >
-              Sign Out
-            </button>
+            <>
+              <button
+                type="submit"
+                onClick={() => navigate("/code")}
+                className="bg-blue-500 text-white py-2 px-4 rounded "
+              >
+                Code
+              </button>
+              <button
+                onClick={handleSignOut}
+                className="bg-red-500 text-white py-2 px-4 rounded"
+              >
+                Sign Out
+              </button>
+            </>
           ) : (
             <button
               onClick={() => signInWithGoogle()}
